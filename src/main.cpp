@@ -1,20 +1,23 @@
 #include <Arduino.h>
 
 const int LED_PIN = 33;
+const int BUTTON_PIN = 35;
 
 void setup() {
   printf("setup funtion\n");
 
   pinMode(LED_PIN, OUTPUT);
+  // pinMode(BUTTON_PIN, INPUT_PULLUP);  // GPIO35 は入力専用ピンのため、プルアップ抵抗は外付けのためコメントアウト
 }
 
 void loop() {
   printf("loop function\n");
 
-digitalWrite(LED_PIN, HIGH);
-delay(500);
-digitalWrite(LED_PIN, LOW);
-delay(500);
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
 
 }
 
