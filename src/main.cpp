@@ -20,11 +20,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
   {
     data[len] = 0;
-    // printf((char *)data); // Add this line
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, (char *)data);
     String command = doc["command"].as<String>();
-    // printf(doc["command"]); // Add this line
 
     if(command == "wson") {
       digitalWrite(LED_PIN, HIGH);
@@ -51,7 +49,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
       break;
     
     case WS_EVT_DATA:
-      // printf("ws[%s][%u] recv event(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
       handleWebSocketMessage(arg, data, len);
       break;
     
@@ -89,43 +86,10 @@ void setup() {
       request->send( SPIFFS, "/index.html" );
     }
   );
-
   server.begin();
 }
 
 void loop() {
   ws.cleanupClients();
-
-
-  // if( client ) {
-  //   String current_line = "";
-  //   while( client.available() ) {
-  //     char c = client.read();
-  //     printf("%c", c);
-  //     if( c=='\n' ) {
-  //       if( current_line.length() == 0 ) {
-  //         client.println("HTTP/1.1 200 OK");
-  //         client.println("Content-Type: text/html");
-  //         client.println("Connection: close");
-  //         client.println();
-  //         client.println(html);
-  //         break;
-  //       } else {
-  //         current_line = "";
-  //       }
-  //     } else if( c!='\r' ) {
-  //       current_line += c;
-  //     }
-
-  //     if(current_line.endsWith("GET /?li")) {
-  //       digitalWrite(LED_PIN, HIGH);
-  //     }
-  //     if(current_line.endsWith("GET /?lo")) {
-  //       digitalWrite(LED_PIN, LOW);
-  //     }
-  //   }
-  // }
-  // client.stop();
-
 }
 
