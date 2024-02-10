@@ -20,11 +20,18 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
   {
     data[len] = 0;
-    printf((char *)data); // Add this line
+    // printf((char *)data); // Add this line
     DynamicJsonDocument doc(1024);
     deserializeJson(doc, (char *)data);
     String command = doc["command"].as<String>();
-    printf(doc["command"]); // Add this line
+    // printf(doc["command"]); // Add this line
+
+    if(command == "wson") {
+      digitalWrite(LED_PIN, HIGH);
+    }
+    if(command == "wsoff") {
+      digitalWrite(LED_PIN, LOW);
+    }
 
   }
 }
