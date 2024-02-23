@@ -11,11 +11,21 @@
             height: 80px
         }
 
+        button {
+            font-size: 24pt;
+            width: 200px;
+            height: 80px
+        }
+
         div {
             font-size: 24pt;
             color: black;
             text-align: center;
-            width: 400px;
+            width: 600px;
+        }
+
+        ul {
+            list-style: none;
         }
     </style>
     <title>羽根足 操作</title>
@@ -24,28 +34,38 @@
 <body>
     <div>
         <p>羽根足 操作</p>
-        <form method='get'>
-            <input type='submit' name='li' value='点灯' />
-            <input type='submit' name='lo' value='消灯' />
-        </form>
         <button id='wson'>WS点灯</button>
         <button id='wsoff'>WS消灯</button>
-        <script>
-            let ws = new WebSocket(`ws://${window.location.hostname}/ws`);
-            ws.onopen = function () { console.log('ws open') };
-            ws.onclose = function () { console.log('ws close') };
-            ws.onmessage = function (event) { console.log('ws message', event.data) };
-            let buttons = document.querySelectorAll('button');
-            buttons.forEach(function (button) {
-                button.addEventListener('touchstart', function () {
-                    let msg = {
-                        command: button.id
-                    };
-                    ws.send(JSON.stringify(msg));
-                });
-            });
-        </script>
+        <!-- <br>
+        <label id='interval'>-</label> -->
     </div>
+    <br>
+    <ul id='lap'></ul>
+    <script>
+        let ws = new WebSocket(`ws://${window.location.hostname}/ws`);
+        let lap_list = document.getElementById('lap');
+        ws.onopen = function () { console.log('ws open') };
+        ws.onclose = function () { console.log('ws close') };
+        ws.onmessage = function (event) {
+            // console.log('ws message', event.data);
+            let msg = JSON.parse(event.data);
+            if (msg.interval) {
+                const li = document.createElement('li');
+                lap_list.prepend(li);
+                li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
+                // document.getElementById('interval').textContent = msg.interval;
+            }
+        };
+        let buttons = document.querySelectorAll('button');
+        buttons.forEach(function (button) {
+            button.addEventListener('touchstart', function () {
+                let msg = {
+                    command: button.id
+                };
+                ws.send(JSON.stringify(msg));
+            });
+        });
+    </script>
 </body>
 
 </html>
