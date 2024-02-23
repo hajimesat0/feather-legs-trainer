@@ -25,5 +25,6 @@ Training machine software to help you develop feather-light footwork for badmint
 * How to build WebSocket server
   * https://registry.platformio.org/libraries/esphome/ESPAsyncWebServer-esphome#methods-for-controlling-websocket-connections
   * https://qiita.com/norippy_i/items/6b2da67602cd52a0412f
-
+* How to interrupt by GPIO
+  * https://blog.goo.ne.jp/jh7ubc/e/8c97dc4bfad4f93d44301f8341083a69
 
