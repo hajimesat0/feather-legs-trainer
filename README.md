@@ -1,5 +1,22 @@
-# feather-legs-trainer
-Training machine software to help you develop feather-light footwork for badminton.
+# 羽根足(feather-legs-trainer)
+
+羽根のように軽いバドミントンフットワークを育成するためのトレーニングシステムソフトウェア
+
+Software for electric training system to help you develop feather-light footwork for badminton.
+
+## システムの目指すところ
+
+* バドミントンフットワークの強化
+* 選手(プレイヤー)の視覚的な認識能力からフットワークへの反射神経を育成する
+* 電子制御により、柔軟な練習メニューの組み立てと(人力に対して)高精度な記録をもとに、データに基づく効率的な育成を促進する
+
+<img src="images\目的レベルユースケース図.drawio.svg" alt="目的レベルユースケース図" title="目的レベルユースケース図">
+
+## 操作ユースケース
+
+コーチ・プレイヤーの行う操作
+
+<img src="images\操作レベルユースケース図.drawio.svg" alt="操作レベルユースケース図" title="操作レベルユースケース図">
 
 ## 操作者指示時の反応時間計測
 
