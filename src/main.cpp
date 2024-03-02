@@ -12,28 +12,51 @@ const IPAddress subnet(255,255,255,0);
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
-const int LED_PIN = 33;
-const int BUTTON_PIN = 35;
-// const int LED_PIN = 32;
-// const int BUTTON_PIN = 34;
+const int LED_PIN_LEFT = 33;
+const int BUTTON_PIN_LEFT = 35;
+const int LED_PIN_RIGHT = 32;
+const int BUTTON_PIN_RIGHT = 34;
 
 unsigned long gLightOnTime = 0;
 unsigned long gLightOffTime = 0;
 bool gExistNewRecord = false;
+bool gIsLightOnLeft = false;
+bool gIsLightOffLeft = false;
+bool gIsLightOnRight = false;
+bool gIsLightOffRight = false;
 
 
-void IRAM_ATTR buttonPushed() {
+void IRAM_ATTR buttonPushedLeft() {
+
+  gIsLightOffLeft = true;
 
   // LED消灯
-  digitalWrite(LED_PIN, LOW);
+  digitalWrite(LED_PIN_LEFT, LOW);
 
   // 割り込みを無効化
-  detachInterrupt(BUTTON_PIN);
+  detachInterrupt(BUTTON_PIN_LEFT);
 
   // ボタンが押された時の処理
   gLightOffTime = millis();
   gExistNewRecord = true;
 }
+
+
+void IRAM_ATTR buttonPushedRight() {
+
+  gIsLightOffRight = true;
+
+  // LED消灯
+  digitalWrite(LED_PIN_RIGHT, LOW);
+
+  // 割り込みを無効化
+  detachInterrupt(BUTTON_PIN_RIGHT);
+
+  // ボタンが押された時の処理
+  gLightOffTime = millis();
+  gExistNewRecord = true;
+}
+
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo *)arg;
@@ -44,21 +67,31 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     deserializeJson(doc, (char *)data);
     String command = doc["command"].as<String>();
 
-    if(command == "wson") {
-      // 計測開始
+    if(command == "bt_left") {
+      // 左側ボタン計測開始
+      gIsLightOnLeft = true;
 
       // LED on 
-      digitalWrite(LED_PIN, HIGH);
+      digitalWrite(LED_PIN_LEFT, HIGH);
 
       // 現在時刻記録
       gLightOnTime = millis();  // 現在時刻記録
 
       // 割り込み有効化
-      attachInterrupt(BUTTON_PIN, buttonPushed, FALLING);
+      attachInterrupt(BUTTON_PIN_LEFT, buttonPushedLeft, FALLING);
     }
-    if(command == "wsoff") {
-      digitalWrite(LED_PIN, LOW);
-      // 計測リセット
+    if(command == "bt_right") {
+      // 右側ボタン計測開始
+      gIsLightOnRight = true;
+
+      // LED on 
+      digitalWrite(LED_PIN_RIGHT, HIGH);
+
+      // 現在時刻記録
+      gLightOnTime = millis();  // 現在時刻記録
+
+      // 割り込み有効化
+      attachInterrupt(BUTTON_PIN_RIGHT, buttonPushedRight, FALLING);
     }
 
   }
@@ -103,8 +136,10 @@ void setup() {
   WiFi.softAPConfig(ip, ip, subnet);
 
   // LED_PIN を出力に設定
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  pinMode(LED_PIN_LEFT, OUTPUT);
+  digitalWrite(LED_PIN_LEFT, LOW);
+  pinMode(LED_PIN_RIGHT, OUTPUT);
+  digitalWrite(LED_PIN_RIGHT, LOW);
 
   // ボタンピンを入力に設定
   // pinMode(BUTTON_PIN, INPUT_PULLUP);  // GPIO35 は入力専用ピンのため、プルアップ抵抗は外付けのためコメントアウト
@@ -146,5 +181,54 @@ void loop() {
     serializeJson(doc, json);
     ws.textAll(json);
   }
+
+  if( gIsLightOnLeft ) {
+    // printf("gIsLightOnLeft\n");
+    gIsLightOnLeft = false;
+    DynamicJsonDocument doc(1024);
+    static char json[200];
+    doc["msg_type"] = 1;
+    doc["button_light_index"] = 0;
+    doc["button_light_on_off"] = 1;
+    serializeJson(doc, json);
+    // printf("json:%s\n",json);
+    ws.textAll(json);
+  }
+
+  if( gIsLightOffLeft ) {
+    gIsLightOffLeft = false;
+    DynamicJsonDocument doc(1024);
+    static char json[200];
+    doc["msg_type"] = 1;
+    doc["button_light_index"] = 0;
+    doc["button_light_on_off"] = 0;
+    serializeJson(doc, json);
+    ws.textAll(json);
+  }
+
+  if( gIsLightOnRight ) {
+    // printf("gIsLightOnRight\n");
+    gIsLightOnRight = false;
+    DynamicJsonDocument doc(1024);
+    static char json[200];
+    doc["msg_type"] = 1;
+    doc["button_light_index"] = 1;
+    doc["button_light_on_off"] = 1;
+    serializeJson(doc, json);
+    // printf("json:%s\n",json);
+    ws.textAll(json);
+  }
+
+  if( gIsLightOffRight ) {
+    gIsLightOffRight = false;
+    DynamicJsonDocument doc(1024);
+    static char json[200];
+    doc["msg_type"] = 1;
+    doc["button_light_index"] = 1;
+    doc["button_light_on_off"] = 0;
+    serializeJson(doc, json);
+    ws.textAll(json);
+  }
+
 }
 

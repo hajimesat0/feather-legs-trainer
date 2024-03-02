@@ -8,39 +8,45 @@
             font-size: 24pt;
             margin: 8px;
             width: 100px;
-            height: 80px
+            height: 80px;
         }
 
         button {
             font-size: 24pt;
-            width: 200px;
-            height: 80px
+            width: 25vw;
+            height: 25vw;
+            border-radius: 50%;
+            background-color: rgb(128, 0, 0);
+            /* background-color: rgb(255, 100, 100); */
         }
 
         div {
             font-size: 24pt;
             color: black;
             text-align: center;
-            width: 600px;
+                /* width: 600px; */
+            margin: 0 auto;
+            position: relative;
         }
 
         ul {
+            font-size: 24pt;
             list-style: none;
         }
     </style>
-    <title>羽根足 操作</title>
+    <title>羽根足</title>
 </head>
 
 <body>
     <div>
-        <p>羽根足 操作</p>
-        <button id='wson'>WS点灯</button>
-        <button id='wsoff'>WS消灯</button>
-        <!-- <br>
-        <label id='interval'>-</label> -->
+        <p>羽根足 (※一番上が最新の記録です)</p>
+        <button id='bt_left' style="position: absolute; left: 10%;"></button>
+        <button id='bt_right' style="position: absolute; right: 10%;"></button>
+        <br>
+        <ul id='lap'>
+            <!-- <li>debug</li> -->
+        </ul>
     </div>
-    <br>
-    <ul id='lap'></ul>
     <script>
         let ws = new WebSocket(`ws://${window.location.hostname}/ws`);
         let lap_list = document.getElementById('lap');
@@ -49,11 +55,23 @@
         ws.onmessage = function (event) {
             // console.log('ws message', event.data);
             let msg = JSON.parse(event.data);
+
+            if (msg.msg_type==1) {
+                let button_index = parseInt(msg.button_light_index);
+                switch (button_index) {
+                    case 0:
+                        document.getElementById('bt_left').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+                        break;
+                    case 1:
+                        document.getElementById('bt_right').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+                        break;
+                }
+            }
+
             if (msg.interval) {
                 const li = document.createElement('li');
                 lap_list.prepend(li);
                 li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
-                // document.getElementById('interval').textContent = msg.interval;
             }
         };
         let buttons = document.querySelectorAll('button');
