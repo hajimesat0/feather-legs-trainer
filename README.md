@@ -47,6 +47,48 @@ Software for electric training system to help you develop feather-light footwork
 
 <img src="images\ボタン制御クラス図.drawio.svg" alt="ボタン制御クラス図" title="ボタン制御クラス図">
 
+## 操作デバイスとボタン制御デバイス(ESP)間のやり取り
+
+### LED点灯要求(操作デバイス→ボタン制御デバイス)
+
+``` json
+{
+  "command": "ReqLightOn",
+  "buttonId": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 15
+  },
+  "onoff": {
+    "type": "boolean"
+  }
+}
+```
+
+### リセット要求(操作デバイス→ボタン制御デバイス)
+
+``` json
+{
+  "command": "ReqReset"
+}
+```
+
+### 測定結果応答(ボタン制御デバイス→操作デバイス)
+
+``` json
+{
+  "command": "ResResult",
+  "buttonId": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 15
+  },
+  "reactionTime": {
+    "type": "integer",
+    "minimum": 0
+  }
+}
+```
 
 ## memo
 
@@ -58,4 +100,6 @@ Software for electric training system to help you develop feather-light footwork
   * https://qiita.com/norippy_i/items/6b2da67602cd52a0412f
 * How to interrupt by GPIO
   * https://blog.goo.ne.jp/jh7ubc/e/8c97dc4bfad4f93d44301f8341083a69
-
+* About data schema
+  * https://json-schema.org/
+  * https://eng-blog.iij.ad.jp/archives/6813
