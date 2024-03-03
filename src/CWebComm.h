@@ -7,9 +7,10 @@
 class CWebComm
 {
 public:
-    CWebComm( IRequestListener *request_listener );
+    CWebComm();
     ~CWebComm();
 
+    void Setup( IRequestListener *request_listener );
     void Loop();
 
     void OnWsEvent(

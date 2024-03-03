@@ -3,9 +3,22 @@
 #include "CWebComm.h"
 
 
-CWebComm::CWebComm( IRequestListener *request_listener )
+CWebComm::CWebComm()
+: RequestListener(NULL)
+, WebServer(NULL)
+, WebSocketServer(NULL)
 {
-    RequestListener = request_listener;  
+}
+
+
+CWebComm::~CWebComm()
+{
+}
+
+
+void CWebComm::Setup( IRequestListener *request_listener )
+{
+    RequestListener = request_listener;
 
     if( !SPIFFS.begin(true) ) {
         printf("SPIFFS Mount Failed\n");
@@ -33,12 +46,6 @@ CWebComm::CWebComm( IRequestListener *request_listener )
     );
     WebServer->begin();
 }
-
-
-CWebComm::~CWebComm()
-{
-}
-
 
 void CWebComm::Loop()
 {

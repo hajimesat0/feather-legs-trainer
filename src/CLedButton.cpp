@@ -7,6 +7,8 @@ int CLedButton::EnableCallbackPin = -1;
 
 
 CLedButton::CLedButton()
+: LedPin(-1)
+, ButtonPin(-1)
 {
 }
 

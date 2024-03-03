@@ -4,7 +4,7 @@
 enum EStatus
 {
     EStatus_Wait,
-    EStatus_MEasuring
+    EStatus_Measuring
 };
 
 #endif // __EStatus_h__
