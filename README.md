@@ -33,6 +33,20 @@ Software for electric training system to help you develop feather-light footwork
 
 <img src="images\反応時間計測シーケンス図.drawio.svg" alt="反応時間計測シーケンス図" title="反応時間計測シーケンス図">
 
+## ESP側状態遷移図
+
+ボタンのLED点灯をトリガとして反応時間を計測する。
+ボタンは複数個に対応できることを想定するが、同時に2つ以上のボタンに対して時間測定の指示は行わないこととする。つまり、時間計測はいずれかのボタン1つに対してのみ。
+
+<img src="images\ボタン制御状態遷移図.drawio.svg" alt="(ESP側)ボタン制御状態遷移図" title="(ESP側)ボタン制御状態遷移図">
+
+> [!Note]
+> 将来的にプレイヤーが中央位置へ戻るまでの反応時間計測などの仕様が増える可能性があるが、現時点では考慮していない。
+
+## ESP側クラス図
+
+<img src="images\ボタン制御クラス図.drawio.svg" alt="ボタン制御クラス図" title="ボタン制御クラス図">
+
 
 ## memo
 
