@@ -1,16 +1,19 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
-#include <SPIFFS.h>
-#include <ESPAsyncWebServer.h>
+// #include <SPIFFS.h>
+// #include <ESPAsyncWebServer.h>
+#include "CReactionTimer.h"
 
 const char *ssid = "Haneashi-AP";
 const char *password = "123456789";
 const IPAddress ip(192, 168, 0, 100);
 const IPAddress subnet(255,255,255,0);
 
-AsyncWebServer server(80);
-AsyncWebSocket ws("/ws");
+static CReactionTimer *ReactionTimer;
+
+// AsyncWebServer server(80);
+// AsyncWebSocket ws("/ws");
 
 const int LED_PIN_LEFT = 33;
 const int BUTTON_PIN_LEFT = 35;
@@ -58,77 +61,77 @@ void IRAM_ATTR buttonPushedRight() {
 }
 
 
-void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
-  AwsFrameInfo *info = (AwsFrameInfo *)arg;
-  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
-  {
-    data[len] = 0;
-    DynamicJsonDocument doc(1024);
-    deserializeJson(doc, (char *)data);
-    String command = doc["command"].as<String>();
+// void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+//   AwsFrameInfo *info = (AwsFrameInfo *)arg;
+//   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT)
+//   {
+//     data[len] = 0;
+//     DynamicJsonDocument doc(1024);
+//     deserializeJson(doc, (char *)data);
+//     String command = doc["command"].as<String>();
 
-    if(command == "bt_left") {
-      // 左側ボタン計測開始
-      gIsLightOnLeft = true;
+//     if(command == "bt_left") {
+//       // 左側ボタン計測開始
+//       gIsLightOnLeft = true;
 
-      // LED on 
-      digitalWrite(LED_PIN_LEFT, HIGH);
+//       // LED on 
+//       digitalWrite(LED_PIN_LEFT, HIGH);
 
-      // 現在時刻記録
-      gLightOnTime = millis();  // 現在時刻記録
+//       // 現在時刻記録
+//       gLightOnTime = millis();  // 現在時刻記録
 
-      // 割り込み有効化
-      attachInterrupt(BUTTON_PIN_LEFT, buttonPushedLeft, FALLING);
-    }
-    if(command == "bt_right") {
-      // 右側ボタン計測開始
-      gIsLightOnRight = true;
+//       // 割り込み有効化
+//       attachInterrupt(BUTTON_PIN_LEFT, buttonPushedLeft, FALLING);
+//     }
+//     if(command == "bt_right") {
+//       // 右側ボタン計測開始
+//       gIsLightOnRight = true;
 
-      // LED on 
-      digitalWrite(LED_PIN_RIGHT, HIGH);
+//       // LED on 
+//       digitalWrite(LED_PIN_RIGHT, HIGH);
 
-      // 現在時刻記録
-      gLightOnTime = millis();  // 現在時刻記録
+//       // 現在時刻記録
+//       gLightOnTime = millis();  // 現在時刻記録
 
-      // 割り込み有効化
-      attachInterrupt(BUTTON_PIN_RIGHT, buttonPushedRight, FALLING);
-    }
+//       // 割り込み有効化
+//       attachInterrupt(BUTTON_PIN_RIGHT, buttonPushedRight, FALLING);
+//     }
 
-  }
-}
+//   }
+// }
 
 
-void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
-  switch( type ) {
-    case WS_EVT_CONNECT:
-      printf("ws[%s][%u] connect\n", server->url(), client->id());
-      break;
+// void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
+//   switch( type ) {
+//     case WS_EVT_CONNECT:
+//       printf("ws[%s][%u] connect\n", server->url(), client->id());
+//       break;
     
-    case WS_EVT_DISCONNECT:
-      printf("ws[%s][%u] disconnect\n", server->url(), client->id());
-      break;
+//     case WS_EVT_DISCONNECT:
+//       printf("ws[%s][%u] disconnect\n", server->url(), client->id());
+//       break;
     
-    case WS_EVT_ERROR:
-      printf("ws[%s][%u] error(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
-      break;
+//     case WS_EVT_ERROR:
+//       printf("ws[%s][%u] error(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
+//       break;
     
-    case WS_EVT_DATA:
-      handleWebSocketMessage(arg, data, len);
-      break;
+//     case WS_EVT_DATA:
+//       handleWebSocketMessage(arg, data, len);
+//       break;
     
-    default:
-      printf("ws[%s][%u] default(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
-      break;
-  }
-}
+//     default:
+//       printf("ws[%s][%u] default(%u): %s\n", server->url(), client->id(), *((uint16_t*)arg), (char*)data);
+//       break;
+//   }
+// }
 
 void setup() {
   printf("setup funtion\n");
 
-  if( !SPIFFS.begin(true) ) {
-    printf("SPIFFS Mount Failed\n");
-    return;
-  }
+  // if( !SPIFFS.begin(true) ) {
+  //   printf("SPIFFS Mount Failed\n");
+  //   return;
+  // }
 
   WiFi.mode(WIFI_AP_STA);
   WiFi.softAP(ssid, password);
@@ -141,31 +144,22 @@ void setup() {
   pinMode(LED_PIN_RIGHT, OUTPUT);
   digitalWrite(LED_PIN_RIGHT, LOW);
 
+  ReactionTimer = new CReactionTimer(2);
+  ReactionTimer->Setup();
+
   // ボタンピンを入力に設定
   // pinMode(BUTTON_PIN, INPUT_PULLUP);  // GPIO35 は入力専用ピンのため、プルアップ抵抗は外付けのためコメントアウト
   // attachInterrupt(BUTTON_PIN, buttonPushed, FALLING);
 
-  ws.onEvent( onWsEvent );
-  server.addHandler( &ws );
-  server.onNotFound([](AsyncWebServerRequest *request){
-    printf("NOT_FOUND: ");
-    request->send(404);
-  });
-  server.on(
-    "/", HTTP_GET,
-    [](AsyncWebServerRequest *request) {
-      request->send( SPIFFS, "/index.html" );
-    }
-  );
-  server.begin();
 }
 
 void loop() {
-  ws.cleanupClients();
+  ReactionTimer->Loop();
+  // ws.cleanupClients();
 
-  if( gExistNewRecord ) {
-    gExistNewRecord = false;
-    unsigned long interval = gLightOffTime - gLightOnTime;
+  // if( gExistNewRecord ) {
+  //   gExistNewRecord = false;
+  //   unsigned long interval = gLightOffTime - gLightOnTime;
     
     // JsonDocument doc;
     // static char json[200];
@@ -174,61 +168,61 @@ void loop() {
 
     // ws.textAll(json);
 
-    printf("interval: %lu\n", interval);
-    DynamicJsonDocument doc(1024);
-    static char json[200];
-    doc["interval"] = interval;
-    serializeJson(doc, json);
-    ws.textAll(json);
-  }
+  //   printf("interval: %lu\n", interval);
+  //   DynamicJsonDocument doc(1024);
+  //   static char json[200];
+  //   doc["interval"] = interval;
+  //   serializeJson(doc, json);
+  //   ws.textAll(json);
+  // }
 
-  if( gIsLightOnLeft ) {
-    // printf("gIsLightOnLeft\n");
-    gIsLightOnLeft = false;
-    DynamicJsonDocument doc(1024);
-    static char json[200];
-    doc["msg_type"] = 1;
-    doc["button_light_index"] = 0;
-    doc["button_light_on_off"] = 1;
-    serializeJson(doc, json);
-    // printf("json:%s\n",json);
-    ws.textAll(json);
-  }
+  // if( gIsLightOnLeft ) {
+  //   // printf("gIsLightOnLeft\n");
+  //   gIsLightOnLeft = false;
+  //   DynamicJsonDocument doc(1024);
+  //   static char json[200];
+  //   doc["msg_type"] = 1;
+  //   doc["button_light_index"] = 0;
+  //   doc["button_light_on_off"] = 1;
+  //   serializeJson(doc, json);
+  //   // printf("json:%s\n",json);
+  //   ws.textAll(json);
+  // }
 
-  if( gIsLightOffLeft ) {
-    gIsLightOffLeft = false;
-    DynamicJsonDocument doc(1024);
-    static char json[200];
-    doc["msg_type"] = 1;
-    doc["button_light_index"] = 0;
-    doc["button_light_on_off"] = 0;
-    serializeJson(doc, json);
-    ws.textAll(json);
-  }
+  // if( gIsLightOffLeft ) {
+  //   gIsLightOffLeft = false;
+  //   DynamicJsonDocument doc(1024);
+  //   static char json[200];
+  //   doc["msg_type"] = 1;
+  //   doc["button_light_index"] = 0;
+  //   doc["button_light_on_off"] = 0;
+  //   serializeJson(doc, json);
+  //   ws.textAll(json);
+  // }
 
-  if( gIsLightOnRight ) {
-    // printf("gIsLightOnRight\n");
-    gIsLightOnRight = false;
-    DynamicJsonDocument doc(1024);
-    static char json[200];
-    doc["msg_type"] = 1;
-    doc["button_light_index"] = 1;
-    doc["button_light_on_off"] = 1;
-    serializeJson(doc, json);
-    // printf("json:%s\n",json);
-    ws.textAll(json);
-  }
+  // if( gIsLightOnRight ) {
+  //   // printf("gIsLightOnRight\n");
+  //   gIsLightOnRight = false;
+  //   DynamicJsonDocument doc(1024);
+  //   static char json[200];
+  //   doc["msg_type"] = 1;
+  //   doc["button_light_index"] = 1;
+  //   doc["button_light_on_off"] = 1;
+  //   serializeJson(doc, json);
+  //   // printf("json:%s\n",json);
+  //   ws.textAll(json);
+  // }
 
-  if( gIsLightOffRight ) {
-    gIsLightOffRight = false;
-    DynamicJsonDocument doc(1024);
-    static char json[200];
-    doc["msg_type"] = 1;
-    doc["button_light_index"] = 1;
-    doc["button_light_on_off"] = 0;
-    serializeJson(doc, json);
-    ws.textAll(json);
-  }
+  // if( gIsLightOffRight ) {
+  //   gIsLightOffRight = false;
+  //   DynamicJsonDocument doc(1024);
+  //   static char json[200];
+  //   doc["msg_type"] = 1;
+  //   doc["button_light_index"] = 1;
+  //   doc["button_light_on_off"] = 0;
+  //   serializeJson(doc, json);
+  //   ws.textAll(json);
+  // }
 
 }
 

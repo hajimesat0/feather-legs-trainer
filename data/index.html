@@ -74,14 +74,30 @@
                 li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
             }
         };
-        let buttons = document.querySelectorAll('button');
-        buttons.forEach(function (button) {
-            button.addEventListener('touchstart', function () {
-                let msg = {
-                    command: button.id
-                };
-                ws.send(JSON.stringify(msg));
-            });
+        // let buttons = document.querySelectorAll('button');
+        // buttons.forEach(function (button) {
+        //     button.addEventListener('touchstart', function () {
+        //         let msg = {
+        //             command: button.id
+        //         };
+        //         ws.send(JSON.stringify(msg));
+        //     });
+        // });
+        document.getElementById('bt_left').addEventListener('touchstart', function () {
+            let msg = {
+                command: 'ReqLightOn',
+                buttonId: 0,
+                onoff: true
+            };
+            ws.send(JSON.stringify(msg));
+        });
+        document.getElementById('bt_right').addEventListener('touchstart', function () {
+            let msg = {
+                command: 'ReqLightOn',
+                buttonId: 1,
+                onoff: true
+            };
+            ws.send(JSON.stringify(msg));
         });
     </script>
 </body>
