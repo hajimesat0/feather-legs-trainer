@@ -138,11 +138,11 @@ void setup() {
   delay(100);
   WiFi.softAPConfig(ip, ip, subnet);
 
-  // LED_PIN を出力に設定
-  pinMode(LED_PIN_LEFT, OUTPUT);
-  digitalWrite(LED_PIN_LEFT, LOW);
-  pinMode(LED_PIN_RIGHT, OUTPUT);
-  digitalWrite(LED_PIN_RIGHT, LOW);
+  // // LED_PIN を出力に設定
+  // pinMode(LED_PIN_LEFT, OUTPUT);
+  // digitalWrite(LED_PIN_LEFT, LOW);
+  // pinMode(LED_PIN_RIGHT, OUTPUT);
+  // digitalWrite(LED_PIN_RIGHT, LOW);
 
   ReactionTimer = new CReactionTimer(2);
   ReactionTimer->Setup();

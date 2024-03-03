@@ -56,23 +56,34 @@
             // console.log('ws message', event.data);
             let msg = JSON.parse(event.data);
 
-            if (msg.msg_type==1) {
-                let button_index = parseInt(msg.button_light_index);
-                switch (button_index) {
-                    case 0:
-                        document.getElementById('bt_left').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
-                        break;
-                    case 1:
-                        document.getElementById('bt_right').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
-                        break;
-                }
+            switch( msg.command )
+            {
+                case 'ResResult':
+                    const li = document.createElement('li');
+                    lap_list.prepend(li);
+                    li.textContent = (parseInt(msg.reactionTime)/1000.0).toFixed(3).padStart(7,' ')+'秒';
+                    break;
+                default:
+                    break;
             }
 
-            if (msg.interval) {
-                const li = document.createElement('li');
-                lap_list.prepend(li);
-                li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
-            }
+            // if (msg.msg_type==1) {
+            //     let button_index = parseInt(msg.button_light_index);
+            //     switch (button_index) {
+            //         case 0:
+            //             document.getElementById('bt_left').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+            //             break;
+            //         case 1:
+            //             document.getElementById('bt_right').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+            //             break;
+            //     }
+            // }
+
+            // if (msg.interval) {
+            //     const li = document.createElement('li');
+            //     lap_list.prepend(li);
+            //     li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
+            // }
         };
         // let buttons = document.querySelectorAll('button');
         // buttons.forEach(function (button) {

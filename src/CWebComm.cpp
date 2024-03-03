@@ -79,11 +79,12 @@ void CWebComm::OnWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client,
 }
 
 
-void CWebComm::SendMeasuringResult( unsigned int button_id, unsigned long time_ms )
+void CWebComm::SendMeasuringResult( unsigned int button_index, unsigned long time_ms )
 {
     DynamicJsonDocument doc(1024);
-    doc["buttonId"] = button_id;
-    doc["time"] = time_ms;
+    doc["command"] = "ResResult";
+    doc["buttonId"] = button_index;
+    doc["reactionTime"] = time_ms;
     String json;
     serializeJson(doc, json);
     WebSocketServer->textAll(json);

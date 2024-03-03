@@ -5,6 +5,7 @@
 #include "IPushListener.h"
 #include "CWebComm.h"
 #include "CLedButton.h"
+#include "CStopwatch.h"
 #include "EStatus.h"
 #include "EEvent.h"
 
@@ -27,9 +28,9 @@ private:
     CWebComm *WebComm;
     unsigned int ButtonCount;
     CLedButton *Buttons;
+    CStopwatch *Stopwatch;
     unsigned int RequestLightTargetButtonIndex;
-    bool RequestLightOnOff;
-    
+    bool RequestLightOnOff;    
 
 };
 
