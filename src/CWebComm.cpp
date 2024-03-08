@@ -102,9 +102,9 @@ void CWebComm::handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         String command = doc["command"].as<String>();
 
         if( command=="ReqLightOn") {
-            unsigned int button_id = doc["buttonId"].as<unsigned int>();
+            unsigned int button_index = doc["buttonId"].as<unsigned int>();
             bool onoff = doc["onoff"].as<bool>();
-            RequestListener->OnLight( button_id, onoff );
+            RequestListener->OnLight( button_index, onoff );
         } else if( command=="ReqReset") {
             RequestListener->OnReset();
         }

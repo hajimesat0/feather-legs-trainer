@@ -21,7 +21,7 @@ public:
         uint8_t *data,
         size_t len
     );
-    void SendMeasuringResult( unsigned int button_id, unsigned long time_ms );
+    void SendMeasuringResult( unsigned int button_index, unsigned long time_ms );
 
 private:
     AsyncWebServer *WebServer;
