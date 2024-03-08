@@ -1,5 +1,22 @@
-# feather-legs-trainer
-Training machine software to help you develop feather-light footwork for badminton.
+# 羽根足(feather-legs-trainer)
+
+羽根のように軽いバドミントンフットワークを育成するためのトレーニングシステムソフトウェア
+
+Software for electric training system to help you develop feather-light footwork for badminton.
+
+## システムの目指すところ
+
+* バドミントンフットワークの強化
+* 選手(プレイヤー)の視覚的な認識能力からフットワークへの反射神経を育成する
+* 電子制御により、柔軟な練習メニューの組み立てと(人力に対して)高精度な記録をもとに、データに基づく効率的な育成を促進する
+
+<img src="images\目的レベルユースケース図.drawio.svg" alt="目的レベルユースケース図" title="目的レベルユースケース図">
+
+## 操作ユースケース
+
+コーチ・プレイヤーの行う操作
+
+<img src="images\操作レベルユースケース図.drawio.svg" alt="操作レベルユースケース図" title="操作レベルユースケース図">
 
 ## 操作者指示時の反応時間計測
 
@@ -16,6 +33,62 @@ Training machine software to help you develop feather-light footwork for badmint
 
 <img src="images\反応時間計測シーケンス図.drawio.svg" alt="反応時間計測シーケンス図" title="反応時間計測シーケンス図">
 
+## ESP側状態遷移図
+
+ボタンのLED点灯をトリガとして反応時間を計測する。
+ボタンは複数個に対応できることを想定するが、同時に2つ以上のボタンに対して時間測定の指示は行わないこととする。つまり、時間計測はいずれかのボタン1つに対してのみ。
+
+<img src="images\ボタン制御状態遷移図.drawio.svg" alt="(ESP側)ボタン制御状態遷移図" title="(ESP側)ボタン制御状態遷移図">
+
+> [!Note]
+> 将来的にプレイヤーが中央位置へ戻るまでの反応時間計測などの仕様が増える可能性があるが、現時点では考慮していない。
+
+## ESP側クラス図
+
+<img src="images\ボタン制御クラス図.drawio.svg" alt="ボタン制御クラス図" title="ボタン制御クラス図">
+
+## 操作デバイスとボタン制御デバイス(ESP)間のやり取り
+
+### LED点灯要求(操作デバイス→ボタン制御デバイス)
+
+``` json
+{
+  "command": "ReqLightOn",
+  "buttonId": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 15
+  },
+  "onoff": {
+    "type": "boolean"
+  }
+}
+```
+
+### リセット要求(操作デバイス→ボタン制御デバイス)
+
+``` json
+{
+  "command": "ReqReset"
+}
+```
+
+### 測定結果応答(ボタン制御デバイス→操作デバイス)
+
+``` json
+{
+  "command": "ResResult",
+  "buttonId": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 15
+  },
+  "reactionTime": {
+    "type": "integer",
+    "minimum": 0
+  }
+}
+```
 
 ## memo
 
@@ -27,4 +100,6 @@ Training machine software to help you develop feather-light footwork for badmint
   * https://qiita.com/norippy_i/items/6b2da67602cd52a0412f
 * How to interrupt by GPIO
   * https://blog.goo.ne.jp/jh7ubc/e/8c97dc4bfad4f93d44301f8341083a69
-
+* About data schema
+  * https://json-schema.org/
+  * https://eng-blog.iij.ad.jp/archives/6813
