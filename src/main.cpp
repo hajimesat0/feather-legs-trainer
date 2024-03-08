@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <WiFi.h>
-// #include <SPIFFS.h>
-// #include <ESPAsyncWebServer.h>
 #include "CReactionTimer.h"
 
 const char *ssid = "Haneashi-AP";
@@ -12,53 +10,50 @@ const IPAddress subnet(255,255,255,0);
 
 static CReactionTimer *ReactionTimer;
 
-// AsyncWebServer server(80);
-// AsyncWebSocket ws("/ws");
+// const int LED_PIN_LEFT = 33;
+// const int BUTTON_PIN_LEFT = 35;
+// const int LED_PIN_RIGHT = 32;
+// const int BUTTON_PIN_RIGHT = 34;
 
-const int LED_PIN_LEFT = 33;
-const int BUTTON_PIN_LEFT = 35;
-const int LED_PIN_RIGHT = 32;
-const int BUTTON_PIN_RIGHT = 34;
-
-unsigned long gLightOnTime = 0;
-unsigned long gLightOffTime = 0;
-bool gExistNewRecord = false;
-bool gIsLightOnLeft = false;
-bool gIsLightOffLeft = false;
-bool gIsLightOnRight = false;
-bool gIsLightOffRight = false;
+// unsigned long gLightOnTime = 0;
+// unsigned long gLightOffTime = 0;
+// bool gExistNewRecord = false;
+// bool gIsLightOnLeft = false;
+// bool gIsLightOffLeft = false;
+// bool gIsLightOnRight = false;
+// bool gIsLightOffRight = false;
 
 
-void IRAM_ATTR buttonPushedLeft() {
+// void IRAM_ATTR buttonPushedLeft() {
 
-  gIsLightOffLeft = true;
+//   gIsLightOffLeft = true;
 
-  // LED消灯
-  digitalWrite(LED_PIN_LEFT, LOW);
+//   // LED消灯
+//   digitalWrite(LED_PIN_LEFT, LOW);
 
-  // 割り込みを無効化
-  detachInterrupt(BUTTON_PIN_LEFT);
+//   // 割り込みを無効化
+//   detachInterrupt(BUTTON_PIN_LEFT);
 
-  // ボタンが押された時の処理
-  gLightOffTime = millis();
-  gExistNewRecord = true;
-}
+//   // ボタンが押された時の処理
+//   gLightOffTime = millis();
+//   gExistNewRecord = true;
+// }
 
 
-void IRAM_ATTR buttonPushedRight() {
+// void IRAM_ATTR buttonPushedRight() {
 
-  gIsLightOffRight = true;
+//   gIsLightOffRight = true;
 
-  // LED消灯
-  digitalWrite(LED_PIN_RIGHT, LOW);
+//   // LED消灯
+//   digitalWrite(LED_PIN_RIGHT, LOW);
 
-  // 割り込みを無効化
-  detachInterrupt(BUTTON_PIN_RIGHT);
+//   // 割り込みを無効化
+//   detachInterrupt(BUTTON_PIN_RIGHT);
 
-  // ボタンが押された時の処理
-  gLightOffTime = millis();
-  gExistNewRecord = true;
-}
+//   // ボタンが押された時の処理
+//   gLightOffTime = millis();
+//   gExistNewRecord = true;
+// }
 
 
 // void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
