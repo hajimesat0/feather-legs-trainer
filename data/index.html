@@ -4,24 +4,26 @@
 <head>
     <meta charset='UTF-8'>
     <style>
-        html {
+        /* html {
             touch-action: manipulation;
             overflow: hidden;
-        }
-
+        } */
+/* 
         input {
             font-size: 24pt;
             margin: 8px;
             width: 100px;
             height: 80px;
-        }
+        } */
 
-        button {
+        .button_touch {
             font-size: 24pt;
             width: 25vw;
             height: 25vw;
             border-radius: 50%;
             background-color: rgb(128, 0, 0);
+            /* touch-action: manipulation;
+            overflow: hidden; */
             /* background-color: rgb(255, 100, 100); */
         }
 
@@ -43,10 +45,35 @@
 </head>
 
 <body>
+    <details>
+        <summary>練習強度設定</summary>
+        点灯間隔（ボタンを押してから次のLED点灯するまでの間隔）:
+        <input list="interval_list" id="interval" name="interval" value="1000">
+        <datalist id="interval_list">
+            <option value="3000">
+            <option value="2000">
+            <option value="1500">
+            <option value="1000">
+            <option value="800">
+            <option value="500">
+        </datalist>
+        [ms]
+        <br>
+        点灯回数：
+        <input list="light_count_list" id="light_count" name="light_count" value="10">
+        <datalist id="light_count_list">
+            <option value="30">
+            <option value="20">
+            <option value="10">
+        </datalist>
+        [回]
+        <br>
+        <button id="bt_repeat_start">繰り返し点灯練習開始</button>
+    </details>
     <div>
         <p>羽根足 (※一番上が最新の記録です)</p>
-        <button id='bt_left' style="position: absolute; left: 10%;"></button>
-        <button id='bt_right' style="position: absolute; right: 10%;"></button>
+        <button id='bt_left' class="button_touch" style="position: absolute; left: 10%;"></button>
+        <button id='bt_right' class="button_touch" style="position: absolute; right: 10%;"></button>
         <br>
         <ul id='lap'>
             <!-- <li>debug</li> -->
@@ -55,6 +82,11 @@
     <script>
         let ws = new WebSocket(`ws://${window.location.hostname}/ws`);
         let lap_list = document.getElementById('lap');
+        // let resolve_promise;
+        let event_measured = new Event('measured');
+        // let is_measuring = false;
+
+        
         ws.onopen = function () { console.log('ws open') };
         ws.onclose = function () { console.log('ws close') };
         ws.onmessage = function (event) {
@@ -67,6 +99,7 @@
                     const li = document.createElement('li');
                     lap_list.prepend(li);
                     li.textContent = (parseInt(msg.reactionTime)/1000.0).toFixed(3).padStart(7,' ')+'秒';
+                    window.dispatchEvent(event_measured);
                     break;
                 case 'AckLightOn':
                     if( parseInt(msg.buttonId)==0 )
@@ -82,6 +115,8 @@
         };
 
         document.getElementById('bt_left').addEventListener('touchstart', function () {
+            if( this.disabled ) return;
+
             let msg = {
                 command: 'ReqLightOn',
                 buttonId: 0,
@@ -89,7 +124,10 @@
             };
             ws.send(JSON.stringify(msg));
         });
+
         document.getElementById('bt_right').addEventListener('touchstart', function () {
+            if( this.disabled ) return;
+
             let msg = {
                 command: 'ReqLightOn',
                 buttonId: 1,
@@ -97,9 +135,62 @@
             };
             ws.send(JSON.stringify(msg));
         });
-        document.addEventListener('touchmove', function (event) {
-            event.preventDefault();
-        }, { passive: false });
+
+        // document.addEventListener('touchmove', function (event) {
+        //     event.preventDefault();
+        // }, { passive: false });
+
+        document.getElementById('bt_repeat_start').addEventListener('touchstart', async function () {
+            document.getElementById('bt_left').disabled = true;
+            document.getElementById('bt_right').disabled = true;
+
+            let interval = Number(document.getElementById('interval').value);
+            let light_count = Number(document.getElementById('light_count').value);
+
+            for( let i=0; i<light_count; i++ )
+            {
+                // ボタンを選択
+                let button_index = Math.floor(Math.random() * 2 );
+                let msg = {
+                    command: 'ReqLightOn',
+                    buttonId: button_index,
+                    onoff: true
+                };
+                ws.send(JSON.stringify(msg));
+
+                // この辺りの実装から再開
+                await waitForMeasuring();
+                // let promise = new Promise( (resolve) => {
+                //     resolve_promise = resolve;
+                // });
+                // let response_result = await promise;
+
+                await delay(interval);
+
+            }
+
+            document.getElementById('bt_left').disabled = false;
+            document.getElementById('bt_right').disabled = false;
+
+        });
+
+        let resolveMeasuring;
+        window.addEventListener('measured', function() {
+            if( resolveMeasuring ) {
+                resolveMeasuring();
+                resolveMeasuring = null;
+            }
+        });
+
+        async function waitForMeasuring() {
+            return new Promise(resolve => {
+                resolveMeasuring = resolve;
+            });
+        }
+
+        function delay(time) {
+            return new Promise(resolve => setTimeout(resolve, time));
+        }
     </script>
 </body>
 
