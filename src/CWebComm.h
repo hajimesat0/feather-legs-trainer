@@ -22,6 +22,7 @@ public:
         size_t len
     );
     void SendMeasuringResult( unsigned int button_index, unsigned long time_ms );
+    void SendAckLightOn( unsigned int button_index, bool onoff );
 
 private:
     AsyncWebServer *WebServer;

@@ -68,37 +68,19 @@
                     lap_list.prepend(li);
                     li.textContent = (parseInt(msg.reactionTime)/1000.0).toFixed(3).padStart(7,' ')+'秒';
                     break;
+                case 'AckLightOn':
+                    if( parseInt(msg.buttonId)==0 )
+                    {
+                        document.getElementById('bt_left').style.backgroundColor = msg.onoff ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+                    } else {
+                        document.getElementById('bt_right').style.backgroundColor = msg.onoff ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
+                    }
+                    break;
                 default:
                     break;
             }
-
-            // if (msg.msg_type==1) {
-            //     let button_index = parseInt(msg.button_light_index);
-            //     switch (button_index) {
-            //         case 0:
-            //             document.getElementById('bt_left').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
-            //             break;
-            //         case 1:
-            //             document.getElementById('bt_right').style.backgroundColor = parseInt(msg.button_light_on_off)==1 ? 'rgb(255, 100, 100)' : 'rgb(128, 0, 0)';
-            //             break;
-            //     }
-            // }
-
-            // if (msg.interval) {
-            //     const li = document.createElement('li');
-            //     lap_list.prepend(li);
-            //     li.textContent = (parseInt(msg.interval)/1000.0).toFixed(3).padStart(7,' ')+'秒';
-            // }
         };
-        // let buttons = document.querySelectorAll('button');
-        // buttons.forEach(function (button) {
-        //     button.addEventListener('touchstart', function () {
-        //         let msg = {
-        //             command: button.id
-        //         };
-        //         ws.send(JSON.stringify(msg));
-        //     });
-        // });
+
         document.getElementById('bt_left').addEventListener('touchstart', function () {
             let msg = {
                 command: 'ReqLightOn',

@@ -59,6 +59,9 @@ void CReactionTimer::Loop()
             // ボタンを光らせる
             if( (0 <= RequestLightTargetButtonIndex) && (RequestLightTargetButtonIndex < ButtonCount) )
             {
+                // webボタン点灯応答
+                WebComm->SendAckLightOn( RequestLightTargetButtonIndex,true );
+
                 Buttons[RequestLightTargetButtonIndex].Light( RequestLightOnOff );
                 Buttons[RequestLightTargetButtonIndex].EnablePushCallback();
             }
@@ -77,6 +80,7 @@ void CReactionTimer::Loop()
             // 時間計測終了　←　即時性が必要なため、割り込みコンテキストで実施
             // 結果をWebサーバに通知
             WebComm->SendMeasuringResult( RequestLightTargetButtonIndex, Stopwatch->Elapsed() );
+            WebComm->SendAckLightOn( RequestLightTargetButtonIndex,false );
             State = EStatus_Wait;
             Event = EEvent_None;
         }
