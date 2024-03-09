@@ -91,6 +91,18 @@ void CWebComm::SendMeasuringResult( unsigned int button_index, unsigned long tim
 }
 
 
+void CWebComm::SendAckLightOn( unsigned int button_index, bool onoff )
+{
+    DynamicJsonDocument doc(1024);
+    doc["command"] = "AckLightOn";
+    doc["buttonId"] = button_index;
+    doc["onoff"] = onoff;
+    String json;
+    serializeJson(doc, json);
+    WebSocketServer->textAll(json);
+}
+
+
 void CWebComm::handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 {
     AwsFrameInfo *info = (AwsFrameInfo *)arg;

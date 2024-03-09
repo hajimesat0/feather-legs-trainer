@@ -90,6 +90,22 @@ Software for electric training system to help you develop feather-light footwork
 }
 ```
 
+### LED点灯要求応答(ボタン制御デバイス→操作デバイス)
+
+``` json
+{
+  "command": "AckLightOn",
+  "buttonId": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 15
+  },
+  "onoff": {
+    "type": "boolean"
+  }
+}
+```
+
 ## memo
 
 * How to upload files to FileSystem(SPIFFS) using PlatformIO
