@@ -4,6 +4,11 @@
 <head>
     <meta charset='UTF-8'>
     <style>
+        html {
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+
         input {
             font-size: 24pt;
             margin: 8px;
@@ -110,6 +115,9 @@
             };
             ws.send(JSON.stringify(msg));
         });
+        document.addEventListener('touchmove', function (event) {
+            event.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 
